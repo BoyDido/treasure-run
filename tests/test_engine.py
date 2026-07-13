@@ -60,6 +60,53 @@ class GameEngineTests(unittest.TestCase):
 
         self.assertEqual(len(deck.discard_pile), 2)
 
+    def test_play_card_moves_player_and_discards_card(self) -> None:
+        """Een gespeelde kaart verplaatst de speler en gaat naar de aflegstapel."""
+        engine = GameEngine()
+        state = engine.start_new_game(
+            [("Ana", PlayerColor.RED), ("Bo", PlayerColor.BLUE)]
+        )
+        player = state.players[0]
+        card = player.hand[0]
+
+        played_card = engine.play_card(player.id, 0)
+
+        self.assertEqual(played_card, card)
+        self.assertEqual(player.position, START_POSITION + card.value)
+        self.assertEqual(len(player.hand), 3)
+        self.assertEqual(engine.action_deck.discard_pile, [card])
+
+    def test_play_card_turns_back_after_last_path_space(self) -> None:
+        """Beweging gaat na vak 12 terug naar vak 11."""
+        engine = GameEngine()
+        state = engine.start_new_game(
+            [("Ana", PlayerColor.RED), ("Bo", PlayerColor.BLUE)]
+        )
+        player = state.players[0]
+        player.position = 12
+        player.hand[0] = player.hand[0].__class__(2, player.hand[0].color)
+
+        engine.play_card(player.id, 0)
+
+        self.assertEqual(player.position, 10)
+        self.assertEqual(player.direction, -1)
+
+    def test_play_card_turns_forward_after_first_path_space(self) -> None:
+        """Beweging gaat na vak 1 opnieuw vooruit naar vak 2."""
+        engine = GameEngine()
+        state = engine.start_new_game(
+            [("Ana", PlayerColor.RED), ("Bo", PlayerColor.BLUE)]
+        )
+        player = state.players[0]
+        player.position = 1
+        player.direction = -1
+        player.hand[0] = player.hand[0].__class__(2, player.hand[0].color)
+
+        engine.play_card(player.id, 0)
+
+        self.assertEqual(player.position, 3)
+        self.assertEqual(player.direction, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

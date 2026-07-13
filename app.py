@@ -55,12 +55,13 @@ def render_game_status(engine: GameEngine) -> None:
         return
 
     st.subheader("Spelstatus")
-    st.caption("Sprint 1 — alle spelers starten samen op het centrale startvak.")
+    st.caption("Sprint 3 — speel een kaart om vooruit te bewegen op het pad.")
+    render_board(engine)
     for player in engine.state.players:
         color = PLAYER_COLOR_HEX[player.color.value]
         st.markdown(
             f"<div class='player-card'><span class='token' style='background:{color}'></span>"
-            f"<strong>{player.name}</strong><span>Startvak {player.position}</span></div>",
+            f"<strong>{player.name}</strong><span>Padvak {player.position}</span></div>",
             unsafe_allow_html=True,
         )
 
@@ -71,8 +72,12 @@ def render_game_status(engine: GameEngine) -> None:
     )
     for player in engine.state.players:
         st.markdown(f"#### {player.name}")
-        columns = st.columns(4)
-        for column, card in zip(columns, player.hand, strict=True):
+        if not player.hand:
+            st.caption("Deze speler heeft geen kaarten meer.")
+            continue
+
+        columns = st.columns(len(player.hand))
+        for card_index, (column, card) in enumerate(zip(columns, player.hand)):
             actions = " ".join(_action_icon(action) for action in card.actions) or "—"
             column.markdown(
                 f"<div class='action-card {card.color.value.lower()}'>"
@@ -81,6 +86,11 @@ def render_game_status(engine: GameEngine) -> None:
                 f"<small>{card.action_label}</small></div>",
                 unsafe_allow_html=True,
             )
+            if column.button(
+                f"Speel {card.value}", key=f"play_{player.id}_{card_index}", use_container_width=True
+            ):
+                engine.play_card(player.id, card_index)
+                st.rerun()
 
     if st.button("Spel opnieuw instellen"):
         engine.reset_game()
@@ -96,6 +106,21 @@ def _action_icon(action: CardAction) -> str:
     }[action]
 
 
+def render_board(engine: GameEngine) -> None:
+    """Toon de twaalf vakken van het pad met de spelers op hun huidige positie."""
+    st.subheader("Speelbord")
+    for row_start in range(1, engine.board.path_spaces + 1, 6):
+        columns = st.columns(6)
+        for offset, column in enumerate(columns):
+            position = row_start + offset
+            players = engine.board.players_at(engine.state.players, position)
+            labels = " ".join(player.name[:1].upper() for player in players) or "·"
+            column.markdown(
+                f"<div class='board-space'><strong>Vak {position}</strong><span>{labels}</span></div>",
+                unsafe_allow_html=True,
+            )
+
+
 def main() -> None:
     """Start de Streamlit-gebruikersinterface."""
     st.set_page_config(page_title="Treasure Run", page_icon="🗺️", layout="centered")
@@ -105,6 +130,8 @@ def main() -> None:
         border:1px solid #e5e7eb;border-radius:.65rem;background:#fff;}
         .player-card span:last-child {margin-left:auto;color:#6b7280;}
         .token {width:1.1rem;height:1.1rem;border-radius:50%;display:inline-block;box-shadow:inset 0 0 0 2px #fff;}
+        .board-space {min-height:4.4rem;padding:.5rem;border:1px solid #d1d5db;border-radius:.55rem;background:#f8fafc;
+        display:flex;flex-direction:column;justify-content:space-between;}.board-space span {font-size:1.15rem;color:#1f2937;}
         .action-card {min-height:8.5rem;padding:.65rem;border:2px solid #1f2937;border-radius:.6rem;color:#172033;
         background:#fff;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 2px 5px #0002;}
         .card-value {font-size:2.1rem;font-weight:700;line-height:1;}.card-actions {font-size:1.3rem;}

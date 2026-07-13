@@ -26,7 +26,8 @@ class Player:
 
     name: str
     color: PlayerColor
-    position: tuple[int, int] = START_POSITION
+    position: int = START_POSITION
+    direction: int = 1
     hand: list[ActionCard] = field(default_factory=list)
     id: str = field(default_factory=lambda: str(uuid4()))
 

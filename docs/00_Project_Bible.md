@@ -108,6 +108,22 @@ Moet werken:
 * aflegstapel.
 
 ---
+## Sprint 3 – Beweging
+
+Status: Gepland
+
+Doel:
+- Speler kan bewegen.
+
+Moet werken:
+- Kaart spelen.
+- Kaart afleggen.
+- Bewegingspunten gebruiken.
+- Positie bijwerken.
+
+---
+
+
 
 # 6. Belangrijke spelregels
 
