@@ -122,7 +122,20 @@ Moet werken:
 - Positie bijwerken.
 
 ---
+## Sprint 4 – Schatten
 
+Status: Gepland
+
+Doel:
+- Grotten en schatten.
+
+Moet werken:
+- Grotten vullen.
+- Schat nemen.
+- Schat verdwijnt uit grot.
+- Schat verschijnt bij speler.
+
+---
 
 
 # 6. Belangrijke spelregels

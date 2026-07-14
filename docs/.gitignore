@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test caches
+.pytest_cache/
+.ruff_cache/
+
+# VS Code instellingen
+.vscode/
+
+# Windows
+Thumbs.db
